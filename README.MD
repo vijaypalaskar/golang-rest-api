@@ -1,0 +1,1 @@
+Goalng REST API authentication using mux
