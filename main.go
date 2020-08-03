@@ -23,8 +23,29 @@ type errorResponse struct {
 	Message error  `json:"message"`
 }
 
+type loginPostData struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+ type response struct {
+		Status bool `json:"status"`
+		Message string `json:"message"`
+ }
 func login(w http.ResponseWriter, r *http.Request) {
 
+	var formData loginPostData
+	err := json.NewDecoder(r.Body).Decode(&formData)
+	fmt.Println(err)
+	if(err != nil) {
+		fmt.Fprintf(w,"  form err %v",err)
+		return
+	}
+
+	if formData.Username == "" || formData.Password == "" {
+		json.NewEncoder(w).Encode(response{Status:false,Message:"Username and Password are required"})
+		return
+	}
+	fmt.Println(formData)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":  "123asd",
 		"exp": time.Now().Add(time.Minute * 10).Unix(),
@@ -34,7 +55,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(err)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(tokenResponse{Token: "", Message: "something went wrong!"})
+		fmt.Fprintf(w,"  token err %v",err)
+		// json.NewEncoder(w).Encode(tokenResponse{Token: "", Message: "something went wrong!"})
 		return
 	}
 	// w.WriteHeader(http.StatusOK)
@@ -118,11 +140,11 @@ func main() {
 
 	router.HandleFunc("/api/login", login).Methods(http.MethodPost,http.MethodOptions)
 
-	authRouter := router.PathPrefix("/auth").Subrouter()
+	authRouter := router.PathPrefix("/").Subrouter()
 	 authRouter.Use(authMiddlware)
 //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTYzODQyNTYsImlkIjoiMTIzYXNkIn0.ESmhVuBRDR6Fz1E3PjXt5SriuG2LKvJUqx8zh1en8gc
 	authRouter.HandleFunc("/api/auth", authRoute).Methods(http.MethodPost,http.MethodOptions)
-	authRouter.HandleFunc("/api/logout", logout)
+	router.HandleFunc("/api/logout", logout).Methods(http.MethodGet,http.MethodOptions)
 
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
