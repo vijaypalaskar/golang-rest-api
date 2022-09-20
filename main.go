@@ -48,7 +48,13 @@ func main() {
 	}))
 	router.Use(gin.Recovery())
 	router.Use(Logger())
+
 	router.GET("/", home)
-	router.GET("/users", getAllUsers)
+
+	v1 := router.Group("/v1")
+	{
+		v1.GET("/", home)
+		v1.GET("/users", getAllUsers)
+	}
 	router.Run("localhost:8000")
 }
