@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,8 @@ var users = []user{
 }
 
 func home(c *gin.Context) {
+	example := c.MustGet("example").(string)
+	log.Println(example)
 	c.String(http.StatusOK, "Welcome to REST API")
 }
 
@@ -25,6 +28,7 @@ func getAllUsers(c *gin.Context) {
 
 func main() {
 	router := gin.Default()
+	router.Use(Logger())
 	router.GET("/", home)
 	router.GET("/users", getAllUsers)
 	router.Run("localhost:8000")
