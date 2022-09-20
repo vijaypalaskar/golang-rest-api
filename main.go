@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	logger "github.com/vijaypalaskar/golang-rest-api/middlewares/logger"
 )
 
 type user struct {
@@ -47,7 +48,7 @@ func main() {
 		)
 	}))
 	router.Use(gin.Recovery())
-	router.Use(Logger())
+	router.Use(logger.Logger())
 
 	router.GET("/", home)
 
