@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	logger "github.com/vijaypalaskar/golang-rest-api/middlewares/logger"
+	"github.com/vijaypalaskar/golang-rest-api/middlewares/logger"
 )
 
 type user struct {
@@ -57,5 +58,9 @@ func main() {
 		v1.GET("/", home)
 		v1.GET("/users", getAllUsers)
 	}
-	router.Run("localhost:8000")
+	httpPort := os.Getenv("HTTP_PORT")
+	if httpPort == "" {
+		httpPort = "8000"
+	}
+	router.Run(":" + httpPort)
 }
